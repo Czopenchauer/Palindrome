@@ -10,11 +10,8 @@ Unknown processor
 ```
 | Method                | Mean     | Error     | StdDev    | Allocated |
 |---------------------- |---------:|----------:|----------:|----------:|
-| IsPalindrome_Normal   | 6.611 ns | 0.0971 ns | 0.0909 ns |         - |
-| IsPalindrome_XOR      | 6.655 ns | 0.0840 ns | 0.0786 ns |         - |
-| IsPalindrome_PureSpan | 6.130 ns | 0.0059 ns | 0.0049 ns |         - |
-| IsPalindrome_Smth     | 3.325 ns | 0.0162 ns | 0.0152 ns |         - |
-| IsPalindrome_Simd     |       NA |        NA |        NA |        NA |
-
-Benchmarks with issues:
-  Benchmarks.IsPalindrome_Simd: DefaultJob
+| IsPalindrome_Normal   | 6.662 ns | 0.0839 ns | 0.0785 ns |         - |
+| IsPalindrome_XOR      | 6.646 ns | 0.0759 ns | 0.0710 ns |         - |
+| IsPalindrome_PureSpan | 6.136 ns | 0.0060 ns | 0.0050 ns |         - |
+| IsPalindrome_Smth     | 3.291 ns | 0.0106 ns | 0.0099 ns |         - |
+| IsPalindrome_Simd     | 3.574 ns | 0.0116 ns | 0.0108 ns |         - |

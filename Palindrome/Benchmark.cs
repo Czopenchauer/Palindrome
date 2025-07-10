@@ -153,30 +153,15 @@ public class Benchmarks
         }
 
         var halfLength = span.Length / 2;
-
-        if (halfLength / 2 < 8)
-        {
-            unsafe
-            {
-                fixed (char* ptx = &span[halfLength])
-                {
-                    var pinned = ptx;
-                    var offset = span.Length % 2 == 0 ? 0 : 1;
-                    Span<char> secondSpan = new(pinned + offset, halfLength);
-                    secondSpan.Reverse();
-                    return secondSpan.SequenceCompareTo(span[.. halfLength]) == 0;
-                }
-            }
-        }
-
         unsafe
         {
             fixed (char* ptx = &span[halfLength])
             {
                 var pinned = ptx;
-                fixed (char* ptxFirst = &span[0])
+
+                fixed (char* ptxFirstHalf = &span[0])
                 {
-                    var pinnedFirst = ptxFirst;
+                    var pinnedFirst = ptxFirstHalf;
                     var numberOfFullIntegers = halfLength / 2;
                     if (halfLength % 2 != 0)
                     {
@@ -190,27 +175,31 @@ public class Benchmarks
                         halfLength -= 1;
                     }
 
+                    var off = span.Length % 2 == 0 ? 0 : 1;
                     Span<int> firstSpan = new(pinnedFirst, numberOfFullIntegers);
-                    Span<char> reversable = new(pinned, halfLength);
+                    Span<char> reversable = new(pinned + off, halfLength);
                     reversable.Reverse();
                     fixed (char* reversablePtr = &reversable[0])
                     {
                         Span<int> secondSpan = new(reversablePtr, numberOfFullIntegers);
-                        var firsHalf = Vector128.Create<int>(firstSpan);
-                        var secondHalf = Vector128.Create<int>(secondSpan);
-                        int length = firstSpan.Length;
-                        int remaining = firstSpan.Length % Vector<int>.Count;
-                        for (int i = 0; i < length - remaining; i += Vector<int>.Count)
+                        int length = secondSpan.Length;
+                        int remaining = length % Vector<int>.Count;
+                        if (length - remaining > 0)
                         {
-                            if (firsHalf.Equals(secondHalf))
+                            for (int i = 0; i < length - remaining; i += Vector<int>.Count)
                             {
-                                return true;
+                                var v1 = Vector128.Create<int>(firstSpan[i..Vector<int>.Count]);
+                                var v2 = Vector128.Create<int>(secondSpan[i..Vector<int>.Count]);
+                                if (!v1.Equals(v2))
+                                {
+                                    return false;
+                                }
                             }
                         }
 
-                        for (int i = length - remaining; i < length; i++)
+                        for (var i = 0; i < firstSpan.Length; i++)
                         {
-                            if (firsHalf[i] != secondHalf[i])
+                            if (firstSpan[i] != secondSpan[i])
                             {
                                 return false;
                             }
@@ -236,29 +225,10 @@ public class Benchmarks
             fixed (char* ptx = &span[halfLength])
             {
                 var pinned = ptx;
- 
+
                 fixed (char* ptxFirstHalf = &span[0])
                 {
                     var pinnedFirst = ptxFirstHalf;
-                    int length = span.Length * 2;
-                    int remaining = length % Vector<byte>.Count;
-                    if (length - remaining > 0)
-                    {
-                        var offset = span.Length % 2 == 0 ? 0 : sizeof(char);
-                        Span<byte> secondSpan = new(pinned + offset, halfLength * sizeof(char));
-                        secondSpan.Reverse();
-                        Span<byte> firstSpan = new(pinnedFirst, halfLength * sizeof(char));
-                        for (int i = 0; i < length - remaining; i += Vector<byte>.Count)
-                        {
-                            var v1 = Vector128.Create<byte>(firstSpan[i..Vector<byte>.Count]);
-                            var v2 = Vector128.Create<byte>(secondSpan[i..Vector<byte>.Count]);
-                            if (!v1.Equals(v2))
-                            {
-                                return false;
-                            }
-                        }
-                    }
-
                     var numberOfFullIntegers = halfLength / 2;
                     if (halfLength % 2 != 0)
                     {
@@ -271,16 +241,32 @@ public class Benchmarks
                         *pinnedFirst = (char)0;
                         halfLength -= 1;
                     }
+
                     var off = span.Length % 2 == 0 ? 0 : 1;
-                    Span<int> firstSpanInt = new(pinnedFirst, numberOfFullIntegers);
+                    Span<int> firstSpan = new(pinnedFirst, numberOfFullIntegers);
                     Span<char> reversable = new(pinned + off, halfLength);
                     reversable.Reverse();
                     fixed (char* reversablePtr = &reversable[0])
                     {
                         Span<int> secondSpan = new(reversablePtr, numberOfFullIntegers);
-                        for (var i = 0; i < firstSpanInt.Length; i++)
+                        int length = secondSpan.Length;
+                        int remaining = length % Vector<int>.Count;
+                        if (length - remaining > 0)
                         {
-                            if (firstSpanInt[i] != secondSpan[i])
+                            for (int i = 0; i < length - remaining; i += Vector<int>.Count)
+                            {
+                                var v1 = Vector128.Create<int>(firstSpan[i..Vector<int>.Count]);
+                                var v2 = Vector128.Create<int>(secondSpan[i..Vector<int>.Count]);
+                                if (!v1.Equals(v2))
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+
+                        for (var i = 0; i < firstSpan.Length; i++)
+                        {
+                            if (firstSpan[i] != secondSpan[i])
                             {
                                 return false;
                             }
