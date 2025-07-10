@@ -9,7 +9,7 @@ namespace Palindrome;
 [MemoryDiagnoser] // we need to enable it in explicit way
 public class Benchmarks
 {
-    private const string Input = "abcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcba";
+    private const string Input = "abcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcbaabcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcbaabcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcbaabcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcbaabcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcbaabcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcbaabcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcba";
 
     [Benchmark]
     public bool IsPalindrome_Normal()
@@ -183,13 +183,14 @@ public class Benchmarks
                     {
                         Span<int> secondSpan = new(reversablePtr, numberOfFullIntegers);
                         int length = secondSpan.Length;
-                        int remaining = length % Vector<int>.Count;
+                        int remaining = length % Vector256<int>.Count;
                         if (length - remaining > 0)
                         {
-                            for (int i = 0; i < length - remaining; i += Vector<int>.Count)
+                            for (int i = 0; i < length - remaining; i += Vector256<int>.Count)
                             {
-                                var v1 = Vector128.Create<int>(firstSpan[i..Vector<int>.Count]);
-                                var v2 = Vector128.Create<int>(secondSpan[i..Vector<int>.Count]);
+                                var offset = i + Vector<int>.Count;
+                                var v1 = Vector256.Create<int>(firstSpan[i.. offset]);
+                                var v2 = Vector256.Create<int>(secondSpan[i..offset]);
                                 if (!v1.Equals(v2))
                                 {
                                     return false;
@@ -250,13 +251,14 @@ public class Benchmarks
                     {
                         Span<int> secondSpan = new(reversablePtr, numberOfFullIntegers);
                         int length = secondSpan.Length;
-                        int remaining = length % Vector<int>.Count;
+                        int remaining = length % Vector256<int>.Count;
                         if (length - remaining > 0)
                         {
-                            for (int i = 0; i < length - remaining; i += Vector<int>.Count)
+                            for (int i = 0; i < length - remaining; i += Vector256<int>.Count)
                             {
-                                var v1 = Vector128.Create<int>(firstSpan[i..Vector<int>.Count]);
-                                var v2 = Vector128.Create<int>(secondSpan[i..Vector<int>.Count]);
+                                var offset = i + Vector<int>.Count;
+                                var v1 = Vector256.Create<int>(firstSpan[i.. offset]);
+                                var v2 = Vector256.Create<int>(secondSpan[i..offset]);
                                 if (!v1.Equals(v2))
                                 {
                                     return false;
@@ -291,7 +293,7 @@ public class Tests
     [InlineData("fhgfda32465", false)]
     [InlineData("123456", false)]
     [InlineData("abcd", false)]
-    [InlineData("abcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcba", true)]
+    [InlineData("abcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcbaabcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcbaabcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcbaabcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcbaabcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcbaabcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcbaabcdefghijklmnopqrstuvwxyzzyxwvutsrqponmlkjihgfedcba", true)]
     public void Correctly_detect_palindrome(string input, bool result)
     {
         var sut = new Benchmarks();

@@ -8,10 +8,10 @@ Unknown processor
 
 
 ```
-| Method                | Mean     | Error     | StdDev    | Allocated |
-|---------------------- |---------:|----------:|----------:|----------:|
-| IsPalindrome_Normal   | 6.662 ns | 0.0839 ns | 0.0785 ns |         - |
-| IsPalindrome_XOR      | 6.646 ns | 0.0759 ns | 0.0710 ns |         - |
-| IsPalindrome_PureSpan | 6.136 ns | 0.0060 ns | 0.0050 ns |         - |
-| IsPalindrome_Smth     | 3.291 ns | 0.0106 ns | 0.0099 ns |         - |
-| IsPalindrome_Simd     | 3.574 ns | 0.0116 ns | 0.0108 ns |         - |
+| Method                | Mean      | Error     | StdDev    | Allocated |
+|---------------------- |----------:|----------:|----------:|----------:|
+| IsPalindrome_Normal   | 60.485 ns | 0.4232 ns | 0.3959 ns |         - |
+| IsPalindrome_XOR      | 60.620 ns | 0.2707 ns | 0.2532 ns |         - |
+| IsPalindrome_PureSpan |  5.949 ns | 0.0137 ns | 0.0128 ns |         - |
+| IsPalindrome_Smth     | 13.682 ns | 0.0633 ns | 0.0561 ns |         - |
+| IsPalindrome_Simd     | 13.334 ns | 0.1539 ns | 0.1439 ns |         - |
